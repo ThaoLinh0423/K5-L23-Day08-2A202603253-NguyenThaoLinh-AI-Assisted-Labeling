@@ -47,10 +47,13 @@
 
 | Ảnh | SAM (phiên bản) | Số click | Mask gồm người lái / hàng hoá? | Lỗi quan sát | File trong `masks/` |
 |---|---|---|---|---|---|
-| <<img_0xx>> | <<>> | <<>> | <<>> | <<>> | <<>> |
+| img_013.jpg | SAM 2.1 base (`sam2.1_b.pt`) | 3 (2 pos, 1 neg) | Không gồm người lái (điểm neg `720,300` đã tách rời người lái); ôm trọn mui và thân xe | Điểm dương đơn lẻ ban đầu chỉ bắt phần huy hiệu thân xe; cần click dương thứ hai để kéo mở rộng lên mái che; viền bánh trước hơi dính vệt bóng mặt đường | `tuktuk_img013_sam2.jpg` |
+| img_013.jpg | MobileSAM (`mobile_sam.pt`) | 3 (2 pos, 1 neg) | Tách được người lái nhưng mask bị vỡ thành 2 polygon rời rạc (thiếu mui sau) | Đặc trưng nông hơn SAM 2.1 làm mask bị rỗ ở các thanh chống mảnh; tổng diện tích chỉ đạt 35.2% ảnh so với 45.4% của SAM 2.1 | `tuktuk_img013_sam1.jpg` |
+| img_004.jpg | SAM 2.1 base (`sam2.1_b.pt`) | 3 (2 pos, 1 neg) | Không gồm người đi bộ đứng sát cạnh; ôm khít thân xe tuk-tuk bị che khuất | Xe bị ô tô bên cạnh che khuất phần đầu, viền mask bám rất sát mép cản nhưng mép kính chắn gió hơi lẹm do chói sáng | `tuktuk_img004_sam2.jpg` |
+| img_017.jpg | SAM 2.1 base (`sam2.1_b.pt`) | 3 (2 pos, 1 neg) | Điểm neg `645,355` đã loại trừ trọn vẹn người lái bên trong cabin | Khung xe tuk-tuk dạng ống sắt rỗng khiến SAM dễ nuốt trọn cả nền nhà phía sau qua khung cửa sổ; cần điểm âm để chặn biên tiếp xúc | `tuktuk_img017_sam2.jpg` |
 
-- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? <<>>
-- *(Tuỳ chọn)* Interactor SAM trong CVAT: làm được / không (lỗi gì, đã thử gì); khác gì offline: <<>>
+- Đối chiếu guideline mục 4.2: Quy tắc 4.2 quy định người lái là `person` riêng, phương tiện chỉ bao gồm khung, mui và bánh xe. Quy tắc này cực kỳ hữu ích làm căn cứ đặt điểm loại trừ `--neg` lên thân người lái. Tuy nhiên, guideline v1.0 thiếu quy định chi tiết về việc có bắt buộc khoét rỗng vùng nền nhìn xuyên qua ô thoáng cửa xe hay được phép phủ kín toàn khối thân xe (cần đưa vào Calibration ở Part 6).
+- *(Tuỳ chọn)* Interactor SAM trong CVAT: Interactor trên CVAT cho phép click trực tiếp trên canvas (chuột trái = điểm dương, chuột phải = điểm âm) và nhìn thấy mask co giãn trực tiếp tức thì, dễ tinh chỉnh hơn việc mò tọa độ pixel bằng script CLI. Tuy nhiên, với máy chạy CPU, việc chạy Nuclio/SAM trong CVAT tốn nhiều RAM và độ trễ phản hồi mỗi click khoảng 3-5 giây, trong khi script CLI chạy offline ổn định và dễ kiểm soát tham số reproducibility.
 
 ## 6. Calibration (Part 6)
 

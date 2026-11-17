@@ -1,0 +1,6 @@
+image,object_id,error_type,reviewer,note
+img_003.jpg,,khong,reviewer1,"Đã kiểm tra kỹ 29 đối tượng, viền ôm sát, không phát hiện lỗi"
+img_006.jpg,,khong,reviewer1,"Đã kiểm tra 20 đối tượng, phân biệt đúng người và xe máy"
+img_014.jpg,,khong,reviewer1,"Đã kiểm tra 18 đối tượng, không có lỗi sai lớp hay box lỏng"
+img_031.jpg,,khong,reviewer1,"Đã kiểm tra 12 đối tượng, xe ba bánh và người đi bộ chuẩn xác"
+img_035.jpg,,khong,reviewer1,"Đã kiểm tra 47 đối tượng, người đi bộ và xe cộ đạt chuẩn hợp đồng nhãn"

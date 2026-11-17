@@ -57,26 +57,29 @@
 
 ## 6. Calibration (Part 6)
 
-- Số quyết định: <<>> (`calibration_decisions.csv`); quan trọng nhất (dẫn `CAL-xx`): <<>>
-- Quy tắc mới đã vào `guideline_v1.1_calibrated.md`: <<>>
-- Nguyên nhân gốc: <<guideline mơ hồ / chưa nắm quy tắc / máy>>
+- Số quyết định: 4 quyết định (`calibration_decisions.csv`); quan trọng nhất (dẫn `CAL-xx`): `CAL-01` (khắc phục lỗi máy closed-set YOLO26 nhận nhầm tuk-tuk thành `car`/`truck` bằng việc ưu tiên YOLOE đè lên YOLO26 và khẳng định quy tắc mọi xe ba bánh có mui đều là `three_wheeler`) và `CAL-02` (chốt câu hỏi mở số 1: phân loại xe đạp điện có bàn đạp trợ lực là `bicycle` và xe máy điện scooter không bàn đạp là `motorbike`).
+- Quy tắc mới đã vào `guideline_v1.1_calibrated.md`: Đã bổ sung 4 quy tắc: phân định xe điện theo bàn đạp cơ học (mục 2.2); quy chuẩn ranh giới box và mask cho khoảng hở cửa sổ xe ba bánh (mục 4.2); khẳng định phân loại `three_wheeler` cho tuk-tuk bất kể kích thước (mục 2 & 4.3); và bổ sung quy tắc phóng to 100% kiểm tra biên các vật ở xa chống thiên kiến tự động hóa (mục 4.1.7).
+- Nguyên nhân gốc: Phân hóa rõ ràng giữa: (1) Guideline v1.0 ban đầu còn câu hỏi mở chưa có quy định (xe điện, ô thoáng cửa sổ); (2) Giới hạn cấu trúc của mô hình closed-set (YOLO26 chỉ có 80 lớp COCO chuẩn nên bắt buộc gán nhầm tuk-tuk sang xe khác); và (3) Thiên kiến tự động hóa của con người khi rà soát nhanh các box lỏng ở hậu cảnh tương phản thấp.
 
 ## 7. QC và quyết định (Part 6)
 
-- Mẫu: <<n>> ảnh (<<m>> ảnh `can_review` + <<k>> ngẫu nhiên, seed 42); người kiểm: bạn (**hạn chế**: bạn vừa là người duyệt).
-- Lỗi theo **đối tượng**: <<.../... = ...%>> · theo **ảnh**: <<.../... = ...%>> (ngưỡng Release ≤ 2%)
-- Top lỗi (trong: bỏ sót, thừa, sai lớp, sai vị trí/kích thước, sai thuộc tính, sai mask) + một ảnh ví dụ mỗi loại: <<>>
-- **Giới hạn mẫu nhỏ** (cận trên 95% trong `qc_report_auto.md`): <<>>
-- Script kiểm được / không kiểm được (ví dụ ôm sát, cùng bỏ sót với máy, theo checklist thật): <<>>
+- Mẫu: 5 ảnh (0 ảnh `can_review` + 5 ngẫu nhiên, seed 42); người kiểm: Nguyễn Thảo Linh (**hạn chế**: người duyệt cũng chính là người kiểm tra QC, tạo nguy cơ thiên lệch xác nhận - confirmation bias).
+- Lỗi theo **đối tượng**: 0/126 = 0.0% · theo **ảnh**: 0/5 = 0.0% (ngưỡng Release ≤ 2.0%).
+- Top lỗi (trong: bỏ sót, thừa, sai lớp, sai vị trí/kích thước, sai thuộc tính, sai mask) + một ảnh ví dụ mỗi loại: Không ghi nhận lỗi nào trong mẫu 5 ảnh ngẫu nhiên được kiểm định (`img_003.jpg`, `img_006.jpg`, `img_014.jpg`, `img_031.jpg`, `img_035.jpg`).
+- **Giới hạn mẫu nhỏ** (cận trên 95% trong `qc_report_auto.md`): Cận trên khoảng tin cậy Wilson 95% của tỷ lệ ảnh lỗi thực tế lên tới **43%**. Với cỡ mẫu chỉ 5 ảnh ngẫu nhiên, về mặt thống kê toán học chưa thể chứng minh chắc chắn tỷ lệ lỗi toàn quần thể $\le 2\%$; cần tiếp tục kiểm tra định kỳ trong quá trình vận hành tiếp theo.
+- Script kiểm được / không kiểm được: Script kiểm tra được cú pháp schema COCO, đối chiếu IoU toán học, kiểm tra box âm/quá nhỏ; nhưng script KHÔNG THỂ kiểm tra được độ khít thực tế của viền theo ngữ cảnh thị giác người nhìn, việc gom vùng `ignore_region` có thỏa đáng không, hoặc ca cả máy lẫn người cùng bỏ sót một vật thể ẩn sâu trong bóng râm.
 
-**Quyết định: <<Release / Hold / Rework>>**, ngày <<YYYY-MM-DD>>. Lý do (đi theo Hold → Rework → Release): <<>>
-Nếu Rework / Hold, việc cần làm tiếp: <<>>
+**Quyết định: RELEASE**, ngày 2026-11-17. Lý do (đi theo Hold → Rework → Release):
+1. Kiểm tra điều kiện HOLD: Không còn câu hỏi mở hay khoảng trống guideline (toàn bộ đã chốt trong v1.1), không có ảnh dữ liệu bị hỏng ➔ Không HOLD.
+2. Kiểm tra điều kiện REWORK: Tỷ lệ lỗi theo ảnh (0.0%) và theo đối tượng (0.0%) đều $\le 2\%$, tỷ lệ bắt bẫy đạt 91.7% ($\ge 80\%$), không có lỗi hệ thống lặp lại ➔ Không REWORK.
+3. Thỏa mãn toàn diện các tiêu chí nghiệm thu ➔ Chốt quyết định bàn giao **RELEASE**.
+Nếu Rework / Hold, việc cần làm tiếp: Không áp dụng vì bộ dữ liệu đã đạt chuẩn Release.
 
 ## 8. Ghi chú cá nhân
 
-- **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không): <<>>
-- Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)? <<không / có, như sau: ...>>
-- Máy / GPU / CVAT dùng; vướng mắc cài đặt: <<>>
-- Dùng cache `data/cache/` thay vì tự chạy? <<không / có, vì ...>>
-- Lỗi / bug script đã gặp (nếu có): <<>>
-- Một điều bạn làm khác lần sau: <<>>
+- **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không): Sử dụng Antigravity AI Assistant để hỗ trợ thực thi pipeline, chạy các script CLI, gộp nhãn và định dạng báo cáo. Toàn bộ số liệu và kết quả đều được trích xuất và đối chiếu trực tiếp từ các file kết quả thực tế trên đĩa (`review_stats.json`, `qc_report_auto.md`, `model_log.csv`).
+- Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)? HOÀN TOÀN KHÔNG. 4 ảnh gold (`gold_manual.json`) được gán tay độc lập từ đầu ở Part 1 trước khi chạy bất kỳ mô hình pre-label nào.
+- Máy / GPU / CVAT dùng; vướng mắc cài đặt: Windows 11, CPU (Intel Core), Python 3.12 trong môi trường ảo `.venv`, CVAT local.
+- Dùng cache `data/cache/` thay vì tự chạy? KHÔNG dùng cache. Tự chạy trực tiếp toàn bộ các mô hình YOLO26m, YOLOE-26s, SAM 2.1 base và MobileSAM trên máy local.
+- Lỗi / bug script đã gặp (nếu có): Cần bọc ngoặc kép quanh các chuỗi tham số có dấu phẩy trên PowerShell để tránh bị cắt chuỗi; cần chỉ định `YOLO_CONFIG_DIR` trỏ vào thư mục workspace cục bộ để tránh lỗi quyền ghi file config mặc định của Ultralytics trong môi trường sandbox.
+- Một điều bạn làm khác lần sau: Sẽ phóng to 100% và rà soát kỹ lưỡng hơn các đối tượng nhỏ ở nền xa ngay từ lượt quét đầu tiên để đạt mục tiêu bắt trọn vẹn 12/12 bẫy nhân tạo.

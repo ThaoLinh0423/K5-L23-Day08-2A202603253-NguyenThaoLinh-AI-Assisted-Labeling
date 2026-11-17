@@ -10,3 +10,5 @@ models/*
 *.onnx
 _review/
 *.ts
+.config/
+

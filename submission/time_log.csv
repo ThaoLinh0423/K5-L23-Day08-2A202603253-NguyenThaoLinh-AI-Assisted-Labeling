@@ -1,1 +1,3 @@
 step,images,minutes,note
+gold_manual,4,24,"Gán tay hoàn toàn độc lập 4 ảnh trên CVAT không AI (~6.0 phút/ảnh)"
+batch_review,24,68,"Duyệt lô 24 ảnh có pre-label và 12 bẫy theo checklist 4 bước (~2.8 phút/ảnh)"

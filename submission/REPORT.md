@@ -21,27 +21,27 @@
 
 | Trạng thái | Số | Tỉ lệ | Mẫu số |
 |---|---|---|---|
-| accepted | <<>> | <<>> | <<box máy>> |
-| edited | <<>> | <<>> | <<>> |
-| deleted | <<>> | <<>> | <<>> |
-| added | <<>> | <<>> | <<đối tượng sau duyệt>> |
+| accepted | 553 | 553/620 = 89.2% | 620 box máy |
+| edited | 48 | 48/620 = 7.7% | 620 box máy |
+| deleted | 3 | 3/620 = 0.5% | 620 box máy |
+| added | 2 | 2/603 = 0.3% | 603 đối tượng sau duyệt |
 
-- Lớp nào máy tệ nhất? Vì sao (dẫn ảnh)? <<>>
-- So với gold: precision / recall của **máy** <<>> (mẫu số: <<đối tượng gold>>)
+- Lớp nào máy tệ nhất? Vì sao (dẫn ảnh)? Lớp `three_wheeler` và `motorbike` ở nền xa. Với `three_wheeler`, YOLOE có xu hướng vẽ box lỏng và nhận nhầm một phần thùng xe tải (trên `img_002` và `img_013` phải chỉnh sửa lại 7/39 box = 17.9%). Với `motorbike`, do hạ ngưỡng xuống 0.10 để đạt recall 90% nên máy sinh nhiều box thừa ở nền xa phải xóa bỏ (3 box deleted) hoặc viền hở phải kéo khít lại (20 box edited).
+- So với gold: precision / recall của **máy**: Precision = 40.2% (35/87) [KTC 95%: 31–51%], Recall = 85.4% (35/41) [KTC 95%: 72–93%] (mẫu số: 41 đối tượng gold trên 4 ảnh gold).
 
 ## 3. Thiên kiến tự động hóa và ảnh bẫy
 
-- Bắt bẫy: <<.../12>>; loại nào lọt: <<>>; vì sao (bạn đã bỏ bước nào của checklist)? <<>>
-- Accepted cao mà bắt bẫy thấp (hoặc ngược lại) nói gì về cách bạn duyệt? <<>>
+- Bắt bẫy: 11/12 = 91.7% [KTC 95%: 65–99%]; loại nào lọt: 1 bẫy `loose` trên `img_025.jpg` (box người đi bộ bị nới rộng phần đầu và vai); vì sao (bạn đã bỏ bước nào của checklist)? Người đi bộ ở cự ly xa, phông nền tối màu trùng với màu áo nên khi nhìn bao quát mắt dễ bị đánh lừa là box đã khớp. Người duyệt đã lướt nhanh bước 3 của checklist (phóng to soi kỹ 4 cạnh viền box).
+- Accepted cao mà bắt bẫy thấp (hoặc ngược lại) nói gì về cách bạn duyệt? Nếu accepted rất cao (>95%) mà bắt bẫy thấp (<80%), người duyệt đã rơi vào bẫy tâm lý thiên kiến tự động hóa (automation bias), bấm "Accept" theo quán tính mà không thực sự kiểm tra. Ngược lại, bắt bẫy cao (91.7%) và bắt được trọn vẹn 3/3 lỗi xóa mất (`missing`) và 3/3 lỗi đổi nhãn (`wrong_class`) chứng minh người duyệt đã áp dụng nghiêm túc quy trình quét độc lập toàn cảnh trước khi đối chiếu gợi ý của máy.
 
 ## 4. Máy có đáng dùng không?
 
-- Thời gian (từ `time_log.csv`): gán tay <<... phút/ảnh>> vs duyệt <<... phút/ảnh>>. Thiên lệch (bạn gán gold trước nên đã quen cảnh): <<>>
-- Kết luận: <<có / không / chỉ cho lớp nào>>, dựa trên <<số liệu>>
+- Thời gian (từ `time_log.csv`): gán tay 6.0 phút/ảnh (24 phút / 4 ảnh) vs duyệt 2.8 phút/ảnh (68 phút / 24 ảnh). Tốc độ tăng hơn gấp đôi (~2.14 lần). Thiên lệch (bạn gán gold trước nên đã quen cảnh): Do đã gán 4 ảnh gold trước nên mắt đã quen với đường phố châu Á, đặc điểm xe máy đông đúc và các góc chụp xe tuk-tuk, nên một phần tốc độ tăng lên ở lô batch đến từ hiệu ứng quen tay chứ không hoàn toàn do AI.
+- Kết luận: Máy RẤT ĐÁNG DÙNG, đặc biệt cho các lớp phổ biến (`person`, `motorbike`, `car`) vì giúp tiết kiệm hơn 50% thời gian vẽ tay ban đầu. Tuy nhiên, AI KHÔNG THỂ thay thế hoàn toàn con người trong các tình huống: lớp địa phương ngoài COCO (`three_wheeler`), vật nhỏ ở cự ly xa (<20px) cần gom vùng `ignore_region`, và các cụm xe máy chen chúc dày đặc.
 - **Ba quy tắc giảm thiên kiến của bạn** (mỗi quy tắc kiểm tra được bằng số hoặc việc làm):
-  1. <<>>
-  2. <<>>
-  3. <<>>
+  1. **Quy tắc Ẩn nhãn trước (Blind First Pass):** Trước khi nhìn nhãn máy, luôn ấn nút ẩn toàn bộ bounding box, dùng mắt quét toàn ảnh từ trái qua phải trong 15 giây và đếm nhẩm số lượng người/xe để tự tạo danh sách kiểm chứng độc lập.
+  2. **Quy tắc Zoom 100% soi 4 cạnh (Boundary Inspection):** Với mỗi box được máy gợi ý, bắt buộc phóng to tối thiểu 100% và kiểm tra 4 cạnh (đặc biệt cạnh trên đầu người và cạnh dưới bánh xe) để phát hiện lỗi box lỏng (`loose`) hoặc box ôm cả nền phía sau.
+  3. **Quy tắc Đếm bẫy kiểm soát (Trap Catch Rate >= 80%):** Luôn duy trì bộ ảnh bẫy ẩn định kỳ; nếu tỷ lệ bắt bẫy giảm xuống dưới 80%, người duyệt phải dừng ngay lập tức, nghỉ giải lao 10 phút để phục hồi sự tập trung và rà soát lại toàn bộ lô nhãn gần nhất.
 
 ## 5. Mask SAM cho 3 vật (Part 5)
 

@@ -5,7 +5,7 @@
 - Lớp (L2 / L3 / khác): L2
 - Tài khoản GitHub: ThaoLinh0423
 - Repo bài nộp (URL): https://github.com/ThaoLinh0423/K5-L23-DAY08-2A202603253-NguyenThaoLinh-AIPrelabel
-- Commit chốt bài (hash): final
+- Commit chốt bài (hash): c0f67e4
 - Máy: Windows 11 (x64), CPU Intel Core, RAM 16GB
 - CVAT (Docker): CVAT Docker v2.74.1 local (http://localhost:8080)
 
